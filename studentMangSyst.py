@@ -31,13 +31,11 @@ class Student(Person):
         return f"ID: {self.student_id}, " + super().display_details() + f", Average Grade: {self.average_grade():.2f}"
 
 
-def validate_grade(grade):
-    if not (0 <= grade <= 100):
-        raise ValueError("Grade must be between 0 and 100.")
-
-
 class GradeValidationMixin:
-    pass
+    @staticmethod
+    def validate_grade(grade):
+        if not (0 <= grade <= 100):
+            raise ValueError("Grade must be between 0 and 100.")
 
 
 class StudentManagementSystem(GradeValidationMixin):
@@ -52,7 +50,7 @@ class StudentManagementSystem(GradeValidationMixin):
         self.students[name] = student
 
     def add_grade_to_student(self, name, subject, grade):
-        validate_grade(grade)
+        self.validate_grade(grade)
         student = self.students.get(name)
         if student:
             student.add_grade(subject, grade)
