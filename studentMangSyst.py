@@ -31,10 +31,13 @@ class Student(Person):
         return f"ID: {self.student_id}, " + super().display_details() + f", Average Grade: {self.average_grade():.2f}"
 
 
+def validate_grade(grade):
+    if not (0 <= grade <= 100):
+        raise ValueError("Grade must be between 0 and 100.")
+
+
 class GradeValidationMixin:
-    def validate_grade(self, grade):
-        if not (0 <= grade <= 100):
-            raise ValueError("Grade must be between 0 and 100.")
+    pass
 
 
 class StudentManagementSystem(GradeValidationMixin):
@@ -42,40 +45,66 @@ class StudentManagementSystem(GradeValidationMixin):
         self.students = {}
 
     def add_student(self, name):
+        if name in self.students:
+            print(f"Student with name {name} already exists.")
+            return
         student = Student(name)
-        self.students[student.student_id] = student
+        self.students[name] = student
 
-    def add_grade_to_student(self, student_id, subject, grade):
-        self.validate_grade(grade)
-        student = self.students.get(student_id)
+    def add_grade_to_student(self, name, subject, grade):
+        validate_grade(grade)
+        student = self.students.get(name)
         if student:
             student.add_grade(subject, grade)
         else:
-            print(f"Student with ID {student_id} not found.")
+            print(f"Student with name {name} not found.")
 
-    def show_student_details(self, student_id):
-        student = self.students.get(student_id)
+    def show_student_details(self, name):
+        student = self.students.get(name)
         if student:
             print(student.display_details())
         else:
-            print(f"Student with ID {student_id} not found.")
+            print(f"Student with name {name} not found.")
 
-    def show_student_average_grade(self, student_id):
-        student = self.students.get(student_id)
+    def show_student_average_grade(self, name):
+        student = self.students.get(name)
         if student:
             print(f"Average Grade for {student.name}: {student.average_grade():.2f}")
         else:
-            print(f"Student with ID {student_id} not found.")
+            print(f"Student with name {name} not found.")
 
 
-sms = StudentManagementSystem()
-sms.add_student("Gvn")
-sms.add_student("Aleksandre")
+def main():
+    system = StudentManagementSystem()
 
-sms.add_grade_to_student(1, "Python", 97)
-sms.add_grade_to_student(1, "Science", 90)
+    while True:
+        print("\n1. Add Student")
+        print("2. Add Grade to Student")
+        print("3. Show Student Details")
+        print("4. Exit")
+        choice = input("Enter your choice: ")
 
-sms.show_student_details(1)
-sms.show_student_details(2)
+        if choice == '1':
+            name = input("Enter student's name: ")
+            system.add_student(name)
+            print(f"Student {name} added.")
+        elif choice == '2':
+            name = input("Enter student name: ")
+            subject = input("Enter subject: ")
+            grade = int(input("Enter grade: "))
+            try:
+                system.add_grade_to_student(name, subject, grade)
+                print(f"Grade {grade} added to student {name} for subject {subject}.")
+            except ValueError as e:
+                print(e)
+        elif choice == '3':
+            name = input("Enter student name: ")
+            system.show_student_details(name)
+        elif choice == '4':
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
 
+if __name__ == "__main__":
+    main()
